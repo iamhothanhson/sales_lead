@@ -4,7 +4,7 @@ Backend for a car dealership sales-lead inbox with paginated listing, lead
 creation, lead details, chronological follow-up activities, centralized API
 errors, and basic observability.
 
-## Stack
+## 1. Stack
 
 - Python 3.12
 - FastAPI
@@ -12,10 +12,10 @@ errors, and basic observability.
 - SQLAlchemy 2 (sync)
 - Alembic
 - Pydantic v2
-- pytest + httpx
+- pytest + httpx2
 - Docker Compose
 
-## Layout
+### Layout
 
 ```
 app/
@@ -30,7 +30,7 @@ alembic/          database migrations
 tests/
 ```
 
-## Run with Docker Compose
+### Run with Docker Compose
 
 ```bash
 cp .env.example .env
@@ -49,28 +49,8 @@ The development database is exposed on `localhost:5433`. A separate test
 database is exposed on `localhost:5434`, preventing tests from deleting
 development data. The API container applies Alembic migrations before startup.
 
-## Local tests
-
-```bash
-python3.12 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-docker compose up -d test_db
-pytest
-```
-
-## Migrations
-
-Alembic is configured against `Base.metadata`. Apply the Lead and Activity
-tables with:
-
-```bash
-alembic upgrade head
-alembic revision --autogenerate -m "message"
-```
-
-## Current endpoints
+### Test APIs with Swagger
+http://0.0.0.0:8000/docs
 
 | Method | Path | Purpose |
 |---|---|---|
@@ -80,3 +60,36 @@ alembic revision --autogenerate -m "message"
 | GET | `/api/v1/leads?page=1&page_size=20` | List leads newest-first (maximum page size 100). |
 | GET | `/api/v1/leads/{lead_id}` | Return a lead with chronological activities. |
 | POST | `/api/v1/leads/{lead_id}/activities` | Create a follow-up activity. |
+
+## 2. ## AI Collaboration Narrative
+
+I used GenAI as an engineering assistant while retaining ownership of the architecture and final decisions.
+
+I guided the AI with focused prompts for architecture, implementation, testing, and documentation rather than generating the entire project at once.
+
+The workflow was:
+
+```text
+Design → AI Assistance → Code Review → Tests → Refinement → Verification
+```
+
+AI-generated code was reviewed and validated through automated tests and manual API testing. I specifically verified business logic, database behavior, validation, error handling, and API responses before considering the implementation complete.
+
+## 3. Core Business Logic Tests
+
+The test suite covers the main lead-management workflow, including lead creation,
+lead listing, lead details, activity logging, activity ordering, validation, and
+handling of non-existent leads.
+
+Run the tests with:
+
+### Run all tests
+
+```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
+docker compose up -d test_db
+pytest
+```
